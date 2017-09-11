@@ -53,7 +53,7 @@ class AudioCollection:
         self.feature_params = features.Features.default_feature_params()
         self.audio_collection = set()
         self.cache_temporary_files = False
-        self.uid="%016X"%long(random.random()*100000000000000000L) # unique instance ID
+        self.uid="%016X"%int(random.random()*100000000000000000) # unique instance ID
         self.old_uid=self.uid
         self.adb_data_size=256
         self.adb_ntracks=20000
@@ -73,7 +73,7 @@ class AudioCollection:
             Generate a hash key based on self.feature_params to make an audioDB instance unique to feature set.
         """
         m = hashlib.md5()
-        k = self.feature_params.keys()
+        k = list(self.feature_params.keys())
         k.sort() # ensure vals ordered by key lexicographical order
         vals = [self.feature_params.get(i) for i in k]
         m.update(vals.__repr__())
@@ -98,7 +98,7 @@ class AudioCollection:
         pListName = pth + os.sep + self.uid + "_pList.txt"
         kListName = pth + os.sep + self.uid + "_kList.txt"
         # unpack the names of files we want to insert
-        fList, pList, kList = zip(*self.rTupleList)
+        fList, pList, kList = list(zip(*self.rTupleList))
         # write fList, pList, kList to text files
         self._write_list_to_file(fList, fListName)
         self._write_list_to_file(pList, pListName)
@@ -117,7 +117,7 @@ class AudioCollection:
         try:
             f = open(pth,"w")
         except:
-            print "Error opening: ", pth
+            print("Error opening: ", pth)
             raise error.BregmanError()
         for s in lst: f.write(s+"\n") 
         f.close()
@@ -140,8 +140,8 @@ class AudioCollection:
             Returns rTupleList of features,powers,keys or None if fail.
         """
         aList, fList, pList, kList = self._get_extract_lists(key, keyrepl, wave_suffix)
-        self._fftextract_list(zip(aList,fList,pList,kList))
-        self.rTupleList = zip(fList,pList,kList) # what will be inserted into audioDB
+        self._fftextract_list(list(zip(aList,fList,pList,kList)))
+        self.rTupleList = list(zip(fList,pList,kList)) # what will be inserted into audioDB
         if not extract_only:
             self._insert_features_into_audioDB() # possibly generate new audiodb instance
         self.audio_collection.clear() # clear the audio_collection queue
@@ -162,7 +162,7 @@ class AudioCollection:
         else:
             # replace keyrepl with key as database key
             if not keyrepl: 
-                print "key requires keyrepl for filename substitution"
+                print("key requires keyrepl for filename substitution")
                 raise error.BregmanError()
             kList = [a.replace(keyrepl,key) for a in aList]
         feature_suffix= self._get_feature_suffix()
@@ -199,20 +199,20 @@ class AudioCollection:
                          "-l", lo, "-i", hi, "-g" , logl, "-a", mag, a, f]
                 ret = self._do_subprocess(command)
                 if ret:
-                    print "Error extacting features: ", command
+                    print("Error extacting features: ", command)
                     return None
             else:
-                print "Warning: feature file already exists", f
+                print("Warning: feature file already exists", f)
             if not len(glob.glob(p)):
                 command=["fftExtract", "-p", "bregman.wis", 
                          "-n", nfft, "-w", wfft, "-h", nhop, 
                          "-P", "-l", lo, "-i", hi, a, p]
                 ret = self._do_subprocess(command)
                 if ret:
-                    print "Error extacting powers: ", command
+                    print("Error extacting powers: ", command)
                     return None
             else:
-                print "Warning: power file already exists", p
+                print("Warning: power file already exists", p)
 
     def _remove_temporary_files(self, key=""):
         """
@@ -237,7 +237,7 @@ class AudioCollection:
         """
         if not self._gen_collection_path(self.collection_stem): 
             return 0
-        print "Made new directory: ", self.collection_path
+        print("Made new directory: ", self.collection_path)
         # self._new_adb() # This is now done on feature_insert
         return 1
 
@@ -248,7 +248,7 @@ class AudioCollection:
             Name a new adb instance
         """
         if not self.collection_path:
-            print "Error: self.collection_path not set"
+            print("Error: self.collection_path not set")
             raise error.BregmanError()
         adb_path = self.collection_path + os.sep + self.collection_stem + self._gen_adb_hash() +".adb"
         return adb_path
@@ -261,7 +261,7 @@ class AudioCollection:
         """
         self.collection_path = tempfile.mkdtemp(prefix=name_prefix,dir=self.root_path)
         if not self.collection_path:
-            print "Error making new directory in location: ", self.root_path
+            print("Error making new directory in location: ", self.root_path)
             return 0
         shutil.copymode(self.root_path, self.collection_path) # set permissions
         return 1
@@ -275,18 +275,18 @@ class AudioCollection:
         """
         self.adb_path = self._gen_adb_path()
         if self.adb_path == None:
-            print "self.adb_path must have a string value"
+            print("self.adb_path must have a string value")
             raise error.BregmanError()
         else:
             f = None
             try:
                 f = open(self.adb_path,"rb")
             except:
-                print "Making new audioDB database: ", self.adb_path
+                print("Making new audioDB database: ", self.adb_path)
             finally:
                 if f:
                     f.close()
-                    print "AudioDB database already exists: ", self.adb_path
+                    print("AudioDB database already exists: ", self.adb_path)
                     return 0
 
         # create a NEW audiodb database instance
@@ -310,7 +310,7 @@ class AudioCollection:
         """
         res = subprocess.call(command)
         if res:
-            print "Error in ", command
+            print("Error in ", command)
             raise error.BregmanError()
         return res
 
@@ -343,7 +343,7 @@ class AudioCollection:
         for d in dlist:
             self.load(d)
             toclist.append(self.feature_params)        
-        return zip(dlist,toclist)
+        return list(zip(dlist,toclist))
 
     @classmethod
     def lc(cls, expand=False, limit=None):
@@ -363,16 +363,16 @@ class AudioCollection:
             If expand is set to True, pint each collection's TOC
         """
         dlist, tm = cls._get_collection_list_by_time()
-        dlist = zip(dlist[:limit], tm[:limit])
+        dlist = list(zip(dlist[:limit], tm[:limit]))
         if expand:
             R = cls()
             k = R.toc(dlist[0][0])
             for d,t in dlist: 
-                print d, t
-                print k[0][1].keys()
+                print(d, t)
+                print(list(k[0][1].keys()))
                 for i, v in enumerate(R.toc(d)):
-                    print "[%d]"%i, v[1].values()
-                print ""
+                    print("[%d]"%i, list(v[1].values()))
+                print("")
         return dlist
 
     @classmethod

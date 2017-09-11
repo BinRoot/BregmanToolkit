@@ -98,7 +98,7 @@ def invert_component(cls, w, z, h):
 def ex_1a(x, p, n=4):
     # ex_1a(x, n=4): PLCA into n=4 components         
     # 'p' dict contains feature parameters
-    print "\nExample 1: Standard PLCA with %s"%p['feature'],"features split into n=%d"%n,"components"
+    print("\nExample 1: Standard PLCA with %s"%p['feature'],"features split into n=%d"%n,"components")
     F = Features(x, p)
     w,z,h,norm,recon,logprob = PLCA.analyze(F.X, n)
     X_hat = [invert_component(PLCA, w[:,k], z[k], h[k,:]) for k in range(len(z))]
@@ -114,7 +114,7 @@ def ex_1b(x, p, n=10, alphaZ=-0.01, alphaH=-0.00001):
     # If alphaZ < 0 (e.g. -0.01) the number of components will be truncated
     # If alphaW < 0 (e.g. -0.00001) the frequency functions will be sparse
     # If alphaH < 0 (e.g. -0.00001) the time functions will be sparse
-    print "\nExample 1: Standard PLCA with %s"%p['feature'],"features split into n=%d"%n,"components using Dirichlet priors (alphaZ=%1.6f, alphaH=%1.6f) on component distribution sparseness."%(alphaZ, alphaH)    
+    print("\nExample 1: Standard PLCA with %s"%p['feature'],"features split into n=%d"%n,"components using Dirichlet priors (alphaZ=%1.6f, alphaH=%1.6f) on component distribution sparseness."%(alphaZ, alphaH))    
     F = Features(x, p)
     w,z,h,norm,recon,logprob = PLCA.analyze(F.X, n, alphaZ=alphaZ, alphaH=alphaH)
     X_hat = [invert_component(PLCA, w[:,k], z[k], h[k,:]) for k in range(len(z))]
@@ -128,7 +128,7 @@ def ex_2a(x, p, n=4, win=5):
     # We can use either STFT or CQFT because we only require a time shiftable basis
     # Win is the duration, in frames, of the basis function.
     # 
-    print "\nExample 2: Time-shift invariant PLCA with %s"%p['feature'],"features split into n=%d"%n,"components, component window length=%d"%win
+    print("\nExample 2: Time-shift invariant PLCA with %s"%p['feature'],"features split into n=%d"%n,"components, component window length=%d"%win)
     F = Features(x, p)
     w,z,h,norm,recon,logprob = SIPLCA.analyze(F.X, n, win=win)
     X_hat = [invert_component(SIPLCA, w[:,:,k], z[k], h[k,:]) for k in range(len(z))]
@@ -140,7 +140,7 @@ def ex_2b(x, p, n=10, win=5, alphaZ=-0.01, alphaH=-0.00001):
     # produces a two-dimensional basis that is shift-invariant in time only.
     # 'p' dict contains feature parameters
     # We can use either STFT or CQFT because we only require a time shiftable basis
-    print "\nExample 2: Time-shift invariant PLCA with %s"%p['feature'],"features split into n=%d"%n,"components, component window length=%d"%win, "using Dirichlet priors (alphaZ=%1.6f, alphaH=%1.6f) on component distribution sparseness."%(alphaZ, alphaH)    
+    print("\nExample 2: Time-shift invariant PLCA with %s"%p['feature'],"features split into n=%d"%n,"components, component window length=%d"%win, "using Dirichlet priors (alphaZ=%1.6f, alphaH=%1.6f) on component distribution sparseness."%(alphaZ, alphaH))    
     F = Features(x, p)
     w,z,h,norm,recon,logprob = SIPLCA.analyze(F.X, n, win=win, alphaZ=alphaZ, alphaH=alphaH)
     X_hat = [invert_component(SIPLCA, w[:,:,k], z[k], h[k,:]) for k in range(len(z))]
@@ -153,7 +153,7 @@ def ex_3a(x, p, n=4, win=(1,5)):
     # 'p' dict contains feature parameters
     # We use CQFT which has a logarithmic frequency axis. Transpositions are shifts in frequency.
     # The window fundtion is a tuple, with win[0] the number of shifts, and win[1] the duration of the basis function.
-    print "\nExample 3: Time-frequency-shift invariant PLCA with %s"%p['feature'],"features split into n=%d"%n,"components, component num shifts=%d,window length=%d"%win    
+    print("\nExample 3: Time-frequency-shift invariant PLCA with %s"%p['feature'],"features split into n=%d"%n,"components, component num shifts=%d,window length=%d"%win)    
     F = Features(x, p)
     w,z,h,norm,recon,logprob = SIPLCA2.analyze(F.X, n, win=win)
     X_hat = [invert_component(SIPLCA2, w[:,k,:], z[k], h[k,:,:]) for k in range(len(z))]
@@ -166,7 +166,7 @@ def ex_3b(x, p, n=1, win=(24,5)):
     # 'p' dict contains feature parameters
     # Use CQFT, which has a logarithmic frequency axis, so that transpositions are shifts.
     # 
-    print "\nExample 3: Time-frequency-shift invariant PLCA with %s"%p['feature'],"features split into n=%d"%n,"components, component num shifts=%d,window length=%d"%win    
+    print("\nExample 3: Time-frequency-shift invariant PLCA with %s"%p['feature'],"features split into n=%d"%n,"components, component num shifts=%d,window length=%d"%win)    
     F = Features(x, p)
     w,z,h,norm,recon,logprob = SIPLCA2.analyze(F.X, n, win=win)
     X_hat = [invert_component(SIPLCA2, w[:,k,:], z[k], h[k,:,:]) for k in range(len(z))]

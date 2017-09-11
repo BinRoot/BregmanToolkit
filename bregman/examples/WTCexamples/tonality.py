@@ -18,12 +18,12 @@ import bregman
 try:
     import music21 as m21
 except:
-    print "Warning: music21 not installed, only loading .ascii files supported"
+    print("Warning: music21 not installed, only loading .ascii files supported")
 
 pc_labels = np.tile(['C','C#','D','Eb','E','F','F#','G','G#','A','Bb','B'],13)
 
 def _report(reportStr):
-    print reportStr
+    print(reportStr)
     sys.stdout.flush()
 
 def extract_audio_chroma(flist, nSecs = 10, nSamps = 6):
@@ -62,7 +62,7 @@ def load_corpus(corpus=None, idx=None, win_len=1, sample_len=0):
             for v in sorted(glob.glob(w+'/*')):
                 corpus.append(v)
     corpus.sort()
-    print idx
+    print(idx)
     _report("slicing work list...")
     idx = slice(0,len(corpus)) if idx is None else idx    
     _report("parsing corpus...")
@@ -128,7 +128,7 @@ def load_wtc(idx=None, win_len=1, sample_len=0):
         if not np.iterable(idx):
             idx = [idx]
     else:
-        idx = range(len(flist))
+        idx = list(range(len(flist)))
     flist = np.array(flist)[idx]
     if win_len>0:
         A = [win_mtx(np.loadtxt(fname, dtype='i4'),win_len) for fname in flist]

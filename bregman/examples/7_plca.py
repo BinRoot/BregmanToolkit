@@ -3,7 +3,7 @@ import os
 import os.path
 import bregman
 examples_path = os.path.split(bregman.__file__)[0]+os.sep+'examples'+os.sep+'examples_plca.py'
-execfile(examples_path)
+exec(compile(open(examples_path).read(), examples_path, 'exec'))
 
 play(x) # the amen break is loaded for you
 p # inspect the feature parameters

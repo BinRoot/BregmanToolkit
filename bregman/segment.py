@@ -1,6 +1,6 @@
-import classifier
-import features
-import sound
+from . import classifier
+from . import features
+from . import sound
 import numpy as np
 import pylab as pl
 import scipy.signal
@@ -48,7 +48,7 @@ class Segmentation(object):
         return self.time_spans[index]
 
     def __setitem__(self, index, segment):
-        if type(segment) is not Segment:
+        if not isinstance(segment, Segment):
             raise ValueError("Segmentation requires a Segment")
         self.time_spans[index]=segment
 
@@ -56,7 +56,7 @@ class Segmentation(object):
         return len(self.time_spans)
 
     def append(self, segment):
-        if type(segment) is not Segment:
+        if isinstance(segment, Segment):
             raise ValueError("Segmentation requires a Segment")
         self.time_spans.append(segment)
 
@@ -146,7 +146,7 @@ class GeneralAudioSegmentor(Segmentor):
         clusters = self.assigns[self.diffs[:-1]]
         sr = self.feature.sample_rate
         for seg in np.where(clusters==k)[0]:
-            print self.segmentation[seg]
+            print(self.segmentation[seg])
             x = sound.wavread(self.media, first=int(self.segmentation[seg].time_span.start_time*sr), last=int(self.segmentation[seg].time_span.duration*sr))
             sound.play(x[0].T, sr)
 
@@ -160,7 +160,7 @@ class SegmentationFeatureExtractor(object):
         """
         Given a segmentation and a feature class (plus **kwargs), extract feature for each segment in the segmentation.
         """
-        if type(segmentation.media) is not str:
+        if isinstance(segmentation.media, str):
             raise TypeError("Only file segmentation extraction is currently supported.")
         x,SR,fmt = sound.wavread(segmentation.media, last=1)
         for seg in segmentation: 
