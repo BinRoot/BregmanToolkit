@@ -114,8 +114,8 @@ class KMeans(Classifier):
             else:
                 empty_classes.append(k)
         if len(empty_classes):            
-            self.M = self.M[N.setdiff1d(range(self.num_classes),empty_classes),:]
-            old_means = old_means[N.setdiff1d(range(self.num_classes),empty_classes),:]
+            self.M = self.M[N.setdiff1d(list(range(self.num_classes)),empty_classes),:]
+            old_means = old_means[N.setdiff1d(list(range(self.num_classes)),empty_classes),:]
             self.num_classes -= len(empty_classes)
         sse = ((old_means - self.M)**2).sum()
         return sse
@@ -177,7 +177,7 @@ class SoftKMeans(KMeans):
             self.M[k,:] = Xk.sum(0) / resp[k,:].sum(0)
         sse = ((old_means - self.M)**2).sum()
         if self.verbosity:
-            print "sse = ", sse
+            print("sse = ", sse)
         return sse
 
     
@@ -222,14 +222,14 @@ class GaussianMulti(Classifier):
                self.C - per-class Gaussian covariance matrices
         """
         if labels is None:
-            print "Supervised classifier needs labels to train."
+            print("Supervised classifier needs labels to train.")
             raise ClassifierError()
         num_observations = data.shape[0]
         num_labels = labels.shape[0]
         labs = N.lib.arraysetops.unique(labels) # in lexicographic order
         self.labels = labs
         if len(labs) != self.num_classes:
-            print "number of labels doesn't match number of classes in classifier instance"
+            print("number of labels doesn't match number of classes in classifier instance")
             raise ValueError()
         self.M = N.zeros((len(labs),data.shape[1]))
         self.C = N.zeros((len(labs),data.shape[1],data.shape[1]))

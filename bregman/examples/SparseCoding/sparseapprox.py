@@ -40,7 +40,7 @@ class SparseApproxSpectrum(object):
         data = data.reshape(data.shape[0], -1)
         if len(data)>self.max_samples:
             data = np.random.permutation(data)[:self.max_samples]
-        print data.shape
+        print(data.shape)
         if self.standardize:
             self.mn = np.mean(data, axis=0) 
             self.std = np.std(data, axis=0)
@@ -52,7 +52,7 @@ class SparseApproxSpectrum(object):
         self.standardize=standardize
         self._extract_data_patches(X)
         self.dico = MiniBatchDictionaryLearning(n_components=self.n_components, alpha=1, n_iter=500)
-        print "Dictionary learning from data..."
+        print("Dictionary learning from data...")
         self.D = self.dico.fit(self.data)
         return self
 
@@ -122,7 +122,7 @@ class NMFSpectrum(SparseApproxSpectrum):
         kwargs.setdefault('sparseness','components')
         kwargs.setdefault('init','nndsvd')
         kwargs.setdefault('beta',0.5)
-        print "NMF..."
+        print("NMF...")
         self.model = ProjectedGradientNMF(n_components=self.n_components, **kwargs)
         self.model.fit(self.data)        
         self.D = self.model

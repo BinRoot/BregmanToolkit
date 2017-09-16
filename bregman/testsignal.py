@@ -26,7 +26,7 @@ class TestSignalError(Exception):
     Test signal exception class.
     """
     def __init__(self, msg):
-        print "TestSignal: " + msg
+        print("TestSignal: " + msg)
 
 # Return parameter dict used by all of the test signal generators
 def default_signal_params():
@@ -256,7 +256,7 @@ def modulate(sig, env, nsamps):
         nsamps - audio samples per envelope frame
     """
     if( sig.size != len(env)*nsamps ):
-        print "Source signal size must equal len(env) * nsamps"
+        print("Source signal size must equal len(env) * nsamps")
         return False
     y = pylab.zeros(sig.size)
     start = 0
@@ -300,9 +300,9 @@ def default_rhythm_params():
 
 def _check_rhythm_params(signal_params, rhythm_params, patterns):
     s,r,p = default_rhythm_params()
-    for k in s.keys(): # check for missing keys
+    for k in list(s.keys()): # check for missing keys
         signal_params[k] = signal_params.get(k, s[k])
-    for k in r.keys(): # check for missing keys
+    for k in list(r.keys()): # check for missing keys
         rhythm_params[k] = rhythm_params.get(k, r[k])    
     num_timbres = len(signal_params['cf'])
     if not ( num_timbres == len(signal_params['bw']) == len(signal_params['dur']) == len(patterns) ):

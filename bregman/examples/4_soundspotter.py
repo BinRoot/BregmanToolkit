@@ -169,7 +169,7 @@ def soundspotter(target_file, source_files, p=default_params, win=20, hop=10, nu
 
 
 if __name__ == "__main__":
-    print "Running soundspotter on audio directory..."
+    print("Running soundspotter on audio directory...")
     default_params['nhop']=882
     default_params['lcoef']=3
     sources = glob.glob(os.path.join(audio_dir,"*.wav"))

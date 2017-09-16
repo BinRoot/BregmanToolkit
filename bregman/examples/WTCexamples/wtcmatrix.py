@@ -40,7 +40,7 @@ def get_notes_and_durations_by_measure(work_list):
     Make a list of (midi, quarterLength) tuples per measure from list of works
     """
     notes = [[[(nn.midi,n.quarterLength) for n in w.measure(k).flat.notes for nn in n.pitches] 
-          for k in xrange(1,len(w.measureOffsetMap())+1)] for w in work_list]
+          for k in range(1,len(w.measureOffsetMap())+1)] for w in work_list]
     return notes
 
 def get_notes_and_durations_by_quarters(work_list, num_qtrs=2):
@@ -48,7 +48,7 @@ def get_notes_and_durations_by_quarters(work_list, num_qtrs=2):
     Make a list of (midi, quarterLength) tuples per quaterLength from list of works
     """
     notes = [[[(nn.midi,n.quarterLength) for n in w.flat.notes.getElementsByOffset(i,i+num_qtrs,includeEndBoundary=False) for nn in n.pitches] 
-         for i in xrange(0,int(max([o['offset'] for o in w.flat.notes.offsetMap]))+num_qtrs,num_qtrs)] for w in work_list]
+         for i in range(0,int(max([o['offset'] for o in w.flat.notes.offsetMap]))+num_qtrs,num_qtrs)] for w in work_list]
     return notes
 
 def extract_notes_positions_and_durations(work_list):

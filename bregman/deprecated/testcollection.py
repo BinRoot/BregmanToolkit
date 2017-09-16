@@ -55,7 +55,7 @@ COUNT_KEY="%04X"%0 # 4 hexadecimal digits
 # Exception Handling class
 class TestCollectionError(Exception):
     def __init__(self):
-        print "An error occured inside a function call"
+        print("An error occured inside a function call")
 
 class TestCollection(audiocollection.AudioCollection):
     """
@@ -111,7 +111,7 @@ class TestCollection(audiocollection.AudioCollection):
         """
         # singleton: only one pattern set per TestCollection
         if not self._load_gt_patterns():
-            print "Sequencing patterns..."
+            print("Sequencing patterns...")
             self.patterns = self.sequence_patterns()
             if save_patterns:
                 return self._save_patterns()
@@ -134,10 +134,10 @@ class TestCollection(audiocollection.AudioCollection):
             Persist transformation set parameters via a pattern key
         """
         if self.collection_path == None:
-            print "You must instantiate a ground-truth database first. Use get_pattern_set()"
+            print("You must instantiate a ground-truth database first. Use get_pattern_set()")
             return
         if not self._transformation_set_exists(): 
-            print "Transforming patterns..."
+            print("Transforming patterns...")
             self.transform_patterns()
             if save_transformations:
                 self._save_transformations()
@@ -182,10 +182,10 @@ class TestCollection(audiocollection.AudioCollection):
                self.patterns - integer representation of each rhythm pattern
         """
         if self.collection_path==None:
-            print "save_patterns requires self.collection_path"
+            print("save_patterns requires self.collection_path")
             return False
         if self.patterns==None:
-            print "save_patterns requires self.patterns"
+            print("save_patterns requires self.patterns")
             return False
         f = open(self.collection_path + os.sep + self.collection_stem + "groundtruth.patterns","w")
         pickle.dump(self.patterns, f)
@@ -200,7 +200,7 @@ class TestCollection(audiocollection.AudioCollection):
                self.patterns - integer representation of each rhythm pattern
         """
         if self.collection_path==None:
-            print "load_patterns requires self.collection_path"
+            print("load_patterns requires self.collection_path")
             return
         f = None
         try:
@@ -219,10 +219,10 @@ class TestCollection(audiocollection.AudioCollection):
                self.transformations - integer representation of each rhythm pattern
         """
         if self.collection_path==None:
-            print "save_transformations requires self.collection_path"
+            print("save_transformations requires self.collection_path")
             return False
         if self.transformations==None:
-            print "save_transformations requires self.transformations"
+            print("save_transformations requires self.transformations")
             return False
         key = self._gen_transformations_hash()
         if not key:
@@ -240,7 +240,7 @@ class TestCollection(audiocollection.AudioCollection):
                self.transformations - integer representation of each rhythm pattern
         """
         if self.collection_path==None:
-            print "load_transformations requires self.collection_path"
+            print("load_transformations requires self.collection_path")
             return
         if not key:
             key = self._gen_transformations_hash()
@@ -294,11 +294,11 @@ class TestCollection(audiocollection.AudioCollection):
               suffix   -  unique identifier suffix if required [usually a parameter key]
         """
         if patterns==None:
-            print "_synthesize_patterns: patterns must be specified"
+            print("_synthesize_patterns: patterns must be specified")
             raise TestCollectionError()
         if syn_params==None:
             syn_params = self.syn_params
-        print "Generating audio..."
+        print("Generating audio...")
         for i in range(len(patterns)):
             wav_name = self.collection_path + os.sep + "%06d"%i + suffix + self.uid + ".wav" 
             f = None
@@ -366,7 +366,7 @@ class TestCollection(audiocollection.AudioCollection):
                self.feature_params - audio feature extraction parameters
         """
         if data_path==None:
-            print "You must supply a data_path to load from."
+            print("You must supply a data_path to load from.")
             return
         if data_path[-4:] != "data":
             data_path = self.toc(data_path)[0][0]
@@ -408,7 +408,7 @@ class TestCollection(audiocollection.AudioCollection):
         """
         adb = audiodb.adb.get(self.adb_path,"r")
         lzt = adb.liszt()
-        keys,lens = zip(*lzt)
+        keys,lens = list(zip(*lzt))
         km = KeyMapper(adb, self.num_patterns)
         klist = km.list_key_instances()
         if not len(klist):
@@ -442,19 +442,19 @@ class TestCollection(audiocollection.AudioCollection):
         """
         test_sets = self.get_test_sets()
         if not len(test_sets):
-            print "Empty audioDB instance: ", self.adb_path
+            print("Empty audioDB instance: ", self.adb_path)
             return False
         if test_set_key == None:
-            test_set_list = range(len(test_sets))
+            test_set_list = list(range(len(test_sets)))
         else:
-            print "Evaluating:", test_set_key, "..."
+            print("Evaluating:", test_set_key, "...")
             # find test_set corresponding to key
-            keys, counts = zip(*test_sets)
+            keys, counts = list(zip(*test_sets))
             try:
                 key_idx = keys.index(test_set_key)
                 test_set_list = [key_idx]
             except ValueError:
-                print "Key not found in audioDB test_sets: ", test_set_key
+                print("Key not found in audioDB test_sets: ", test_set_key)
                 raise TestCollectionError()                        
         self.test_set_list=test_set_list
         if clear_lists or self.ranks_list==None:
@@ -479,30 +479,30 @@ class TestCollection(audiocollection.AudioCollection):
         """
         test_sets, test_set_list = self._initialize_test_set_lists(test_set_key, clear_lists)
         for test_set in test_set_list:
-            print "Evaluating test set:", test_set
+            print("Evaluating test set:", test_set)
             ranks=[]
             dists=[]
             adb, lzt = self.setup_evaluation([test_set])
             if not len(lzt):
-                print "Test-set not found in audioDB: ", test_set
+                print("Test-set not found in audioDB: ", test_set)
                 raise TestCollectionError()
-            qkeys, qlens = zip(*lzt)
+            qkeys, qlens = list(zip(*lzt))
             start_pos = test_sets[ test_set ][ 1 ]
             end_pos = start_pos + self.num_patterns
             for q,qkey in enumerate( qkeys[ start_pos : end_pos ] ):
                 res = adb.query(key=qkey).rawData
                 if len(res):
-                    rkeys, dst, qpos, rpos = zip(*res)
+                    rkeys, dst, qpos, rpos = list(zip(*res))
                     dists.extend(dst) # All result distances
                     try: 
                         idx = rkeys.index(adb.configQuery['includeKeys'][q]) # key match
                         ranks.append(idx) # Rank of the transformation
                     except:
-                        print "Key not found in result list: ", qkey
+                        print("Key not found in result list: ", qkey)
                         sys.stdout.flush()
                         ranks.append(-1)
                 else:
-                    print "Empty result list: ", qkey
+                    print("Empty result list: ", qkey)
                     sys.stdout.flush()
                     ranks.append(-1)
             self.ranks_list.append((test_set,ranks))
@@ -517,24 +517,24 @@ class TestCollection(audiocollection.AudioCollection):
             Display the mean ranks of rank lists.
             """
         if self.ranks_list == None:
-            print "print_results requires self.ranks_list to be computed or loaded"
+            print("print_results requires self.ranks_list to be computed or loaded")
             return False
         if test_set_list == None:
             test_set_list = self.test_set_list
         mean_ranks = self.get_mean_ranks()
         klist = self.get_test_sets()
         if not len(klist):
-            print "Skipping empty audioDB: ", self.adb_path
+            print("Skipping empty audioDB: ", self.adb_path)
             return False
         a = self.key_map_inverse(klist[0][0])
-        print "Index %s MeanRank" %a.keys()
-        width = len(a.values().__repr__()) + 6
-        print '=' * width
-        for test_set in mean_ranks.keys():
+        print("Index %s MeanRank" %list(a.keys()))
+        width = len(list(a.values()).__repr__()) + 6
+        print('=' * width)
+        for test_set in list(mean_ranks.keys()):
             a = self.key_map_inverse(klist[test_set][0])
-            strval = a.values()
-            print "[%3d] %s %f" %(test_set, strval, mean_ranks[test_set])
-        print '=' * width
+            strval = list(a.values())
+            print("[%3d] %s %f" %(test_set, strval, mean_ranks[test_set]))
+        print('=' * width)
         return True
     
     def get_mean_ranks(self):
@@ -551,7 +551,7 @@ class TestCollection(audiocollection.AudioCollection):
                 mr[i]=pylab.mean(r)
             return mr
         else:
-            print "get_mean_ranks requires either load_results or evaluate() to have been called"
+            print("get_mean_ranks requires either load_results or evaluate() to have been called")
             return None
     
     def save_results(self):
@@ -561,9 +561,9 @@ class TestCollection(audiocollection.AudioCollection):
             Persist last evaluation result set to a file
         """
         if not (self.test_set_list and self.ranks_list and self.dists_list):
-            print "save_results requires either load_results or evaluate() to have been called"
+            print("save_results requires either load_results or evaluate() to have been called")
             return False
-        self.test_set_list = range(len(self.get_test_sets()))
+        self.test_set_list = list(range(len(self.get_test_sets())))
         f = open(self.collection_path + os.sep + self.collection_stem + self._gen_adb_hash() + self.uid + ".results","w")
         pickle.dump((self.test_set_list, self.ranks_list, self.dists_list), f)
         f.close()
@@ -576,18 +576,18 @@ class TestCollection(audiocollection.AudioCollection):
             Load a previously-saved evaluation result set
         """
         if not self.collection_path:
-            print "load_results requires previous calls to evaluate() and save_results()"
+            print("load_results requires previous calls to evaluate() and save_results()")
             return False
         f=None
         fname = self.collection_path + os.sep + self.collection_stem + self._gen_adb_hash() + self.uid + ".results"
         try:
             f = open(fname,"r")
         except:
-            print "Cannot open --->", fname
+            print("Cannot open --->", fname)
             return False
         self.test_set_list, self.ranks_list, self.dists_list = pickle.load(f)
         f.close()
-        self.test_set_list = range(len(self.get_test_sets()))
+        self.test_set_list = list(range(len(self.get_test_sets())))
         return True
 
     def get_test_sets(self):
@@ -623,12 +623,12 @@ class TestCollection(audiocollection.AudioCollection):
         klist = self.get_test_sets()
         adb = audiodb.adb.get(self.adb_path,"r")
         km = KeyMapper(adb, self.num_patterns)
-        print "Index"
-        print '-'*45
+        print("Index")
+        print('-'*45)
         for i,n in enumerate(klist):
             a = km.map_inverse(n[0])
-            print "[%d] %s" %(i,a)
-        print '-'*45
+            print("[%d] %s" %(i,a))
+        print('-'*45)
         return True
 
     # Evaluation loop for TestCollection objects
@@ -640,14 +640,14 @@ class TestCollection(audiocollection.AudioCollection):
             Iterations over sequencing, synthesis, and analysis parameters
         """
         if not (self.collection_path):
-            print "evaluation_loop requires either self.initialize() or self.load(path...) first"
+            print("evaluation_loop requires either self.initialize() or self.load(path...) first")
             return False
         sequencer_list = self._dict_list_to_tuples(sequencer_dict_list, self.seq_params)
         synthesizer_list = self._dict_list_to_tuples(synthesizer_dict_list, self.syn_params)
         analyzer_list = self._dict_list_to_tuples(analyzer_dict_list, self.feature_params)        
-        print sequencer_list
-        print synthesizer_list
-        print analyzer_list
+        print(sequencer_list)
+        print(synthesizer_list)
+        print(analyzer_list)
         self.cache_temporary_files=False # Automatically remove temporary files
         self.ranks_list = []
         self.dists_list = []
@@ -655,13 +655,13 @@ class TestCollection(audiocollection.AudioCollection):
         for s_tuple in synthesizer_list:
             for s_key, s_val in s_tuple:
                 self.syn_params[s_key] = s_val # change one synthesis parameter
-                print s_key, s_val
+                print(s_key, s_val)
             gt_key=self._gen_patterns_hash(count_key=False)
             self.synthesize_audio(patterns=self.patterns, suffix=gt_key)
             for p_tuple in sequencer_list:
                 for p_key, p_val in p_tuple:                    
                     self.seq_params[p_key] = p_val # change one transformation parameter
-                    print p_key, p_val
+                    print(p_key, p_val)
                 self.gen_transformation_set(save_transformations=True) # Generate controlled random transformations
                 trans_key = self._gen_transformations_hash(count_key=False)
                 self.synthesize_audio(patterns=self.transformations, 
@@ -669,8 +669,8 @@ class TestCollection(audiocollection.AudioCollection):
                 for f_tuple in analyzer_list:
                     for f_key, f_val in f_tuple:
                         self.feature_params[f_key] = f_val # change one feature parameter
-                        print f_key, f_val
-                    print
+                        print(f_key, f_val)
+                    print()
                     curr_gt_key, curr_trans_key = self.extract_features() 
                     self.load_results()
                     self.evaluate(curr_trans_key, clear_lists=False) # output results
@@ -689,8 +689,8 @@ class TestCollection(audiocollection.AudioCollection):
         s = TestCollection._dict_list_to_tuples(dict_list, params_dict)
         for s_tuple in s:
             for s_key, s_val in s_tuple:
-                print s_key, s_val
-            print
+                print(s_key, s_val)
+            print()
         
     @staticmethod
     def _dict_list_to_tuples(dict_list=None, params_dict=None):
@@ -713,10 +713,10 @@ class TestCollection(audiocollection.AudioCollection):
         out_list = []
         if dict_list == None:
             if params_dict == None:
-                print "You must specify a params_dict as default value for dict_list"
+                print("You must specify a params_dict as default value for dict_list")
                 raise TestCollectionError()
             else:
-                out_list.append([params_dict.iteritems().next()])
+                out_list.append([next(iter(params_dict.items()))])
         else:
             if type(dict_list) == tuple or type(dict_list) == list:
                 if len(dict_list)>0 and type(dict_list[0]) == tuple or type(dict_list[0])==list:
@@ -724,16 +724,16 @@ class TestCollection(audiocollection.AudioCollection):
                 else:
                     d_list = []
                     for d in dict_list:
-                        for k in d.keys():
+                        for k in list(d.keys()):
                             d_list.append([t for t in zip([k]*len(d.get(k)),d.get(k))])
-                    tuple_list = zip(*d_list)
+                    tuple_list = list(zip(*d_list))
                     out_list.extend(tuple_list)
             elif type(dict_list) == dict:
-                for k in dict_list.keys(): 
+                for k in list(dict_list.keys()): 
                     tuple_list = [(t,) for t in zip([k]*len(dict_list.get(k)),dict_list.get(k))]
                     out_list.extend(tuple_list)
             else:
-                print "Error in _dict_list_to_tuples. Parameter specification is not dict or list of dicts."
+                print("Error in _dict_list_to_tuples. Parameter specification is not dict or list of dicts.")
                 raise TestCollectionError()
         return out_list
 
@@ -750,7 +750,7 @@ class TestCollection(audiocollection.AudioCollection):
 
                an instance is a test_set instance consisting of self.num_patterns audio files.
         """
-        print "Extracting features / audioDB insertion..."
+        print("Extracting features / audioDB insertion...")
         self._new_adb() 
         ext = self.uid + wave_suffix
 
@@ -776,30 +776,30 @@ class TestCollection(audiocollection.AudioCollection):
             Re-evaluation collects all the results into the current instance, which are then saved.
         """
         if not self.collection_path:
-            print "collection_results requires self.collection_path to be set."
+            print("collection_results requires self.collection_path to be set.")
             return False
         dList = self.toc()
         if plotting: pylab.figure()
         sub=1
         for d,t in dList:
-            print "*** Evaluating AudioDB Instance:", d, "***"
+            print("*** Evaluating AudioDB Instance:", d, "***")
             self.load(d)
-            print self.feature_params.keys()
-            print self.feature_params.values()
+            print(list(self.feature_params.keys()))
+            print(list(self.feature_params.values()))
             if evaluate:
                 self.evaluate()
                 self.save_results()
             else:
                 if not self.load_results():
-                    print "No saved results, skipping..."
+                    print("No saved results, skipping...")
                     continue
                 if not self.print_results():
-                    print "Error printing results..."
+                    print("Error printing results...")
                     continue
             if plotting:
                 pylab.subplot(int(round(len(dList)/2.0)),2,sub)
                 mr = self.get_mean_ranks()
-                pylab.stem(mr.keys(), mr.values())
+                pylab.stem(list(mr.keys()), list(mr.values()))
                 if title_param:
                     pylab.title(title_param + " = {0}".format(self.feature_params[title_param]))
                 sub+=1
@@ -833,7 +833,7 @@ class KeyMapper:
             key = key+"%04X"%c # length-36 key = MD5 parameter hash + 4 count nibbles
             dname = self.collection_path + os.sep + ".key" + key + suffix
             if not self._cache_key_params(dname, param_dict):
-                print "Error saving key cache"
+                print("Error saving key cache")
                 raise TestCollectionError()
         else:
             key = key+"%04X"%0 # length-36 key = MD5 parameter hash + 4 count nibbles        
@@ -841,7 +841,7 @@ class KeyMapper:
 
     def _gen_hash_key(self, param_dict):
         m = hashlib.md5()
-        keys = param_dict.keys()
+        keys = list(param_dict.keys())
         keys.sort() # ensure vals ordered by keys in lexicographical order
         vals = [param_dict.get(k) for k in keys]
         m.update(vals.__repr__())
@@ -863,7 +863,7 @@ class KeyMapper:
                 f = open(dname,"w")
                 pickle.dump(param_dict, f)
             except:
-                print "Error opening key dict cache file: ", dname
+                print("Error opening key dict cache file: ", dname)
                 return False
             finally:
                 if f:
@@ -881,7 +881,7 @@ class KeyMapper:
         lzt = self.adb.liszt()
         if not len(lzt):
             return 0
-        keys,lens = zip(*lzt)
+        keys,lens = list(zip(*lzt))
         count=0
         that_key = BASE_KEY+"%s"%key
         that_key = that_key[0:len(BASE_KEY)+len(HASH_KEY)] # remove instance count
@@ -900,7 +900,7 @@ class KeyMapper:
         lzt = self.adb.liszt()
         if not len(lzt):
             return tuple([])
-        keys,lens = zip(*lzt)
+        keys,lens = list(zip(*lzt))
         key_list=[]
         gt_key = "%032X"%0
         for i,k in enumerate(keys):
@@ -923,7 +923,7 @@ class KeyMapper:
             f = open(dname,"r")
             d = pickle.load(f)
         except:
-            print "Key not in collection: ", key
+            print("Key not in collection: ", key)
         finally:
             if f:
                 f.close()
@@ -1018,7 +1018,7 @@ class RhythmTest(TestCollection):
 
         """
         if not self.patterns:
-            print "You must call either initialize() or load() before run_test()"
+            print("You must call either initialize() or load() before run_test()")
             return False
         key = self._gen_patterns_hash(count_key=False)
         self.synthesize_audio(patterns=self.patterns, suffix=key)
@@ -1039,17 +1039,17 @@ class RhythmTest(TestCollection):
             syn_params = self.syn_params
         num_timbres = len(syn_params['cf'])
         if not ( num_timbres == len(syn_params['bw']) == len(syn_params['dur']) == len(patterns) ):
-                print "Timbre-channel mismatsh between syn_params, seq_params, and num_timbre_channels "
+                print("Timbre-channel mismatsh between syn_params, seq_params, and num_timbre_channels ")
                 raise TestCollectionError()
         return num_timbres
 
     def _check_seq_params(self):
         if self.seq_params['n_flip_bits']==None:
-            print "Must have defined self.n_flip_bits as int"
+            print("Must have defined self.n_flip_bits as int")
             return False
 
         if self.seq_params['rand_channels']==None or type(self.seq_params['rand_channels'])!=list:
-            print "Must have defined self.rand_channels as a list"
+            print("Must have defined self.rand_channels as a list")
             return False
         
         if not (len(self.seq_params['delta_cf']) 
@@ -1058,7 +1058,7 @@ class RhythmTest(TestCollection):
                 == len(self.syn_params['cf'])
                 == len(self.syn_params['bw'])
                 == len(self.syn_params['dur'])):
-            print "Inconsistent delta_cf/cf, delta_bw/bw, delta_dur/dur"
+            print("Inconsistent delta_cf/cf, delta_bw/bw, delta_dur/dur")
             return False        
         return True
 
@@ -1117,7 +1117,7 @@ class RhythmTest(TestCollection):
             rand_sequences = []
             for pc_mu in self.seq_params['poiss_channels']:
                 rand_sequences.append(scipy.stats.poisson.rvs(pc_mu, 0, size=self.seq_params['subdiv']))
-            r_all = zip(*rand_sequences)
+            r_all = list(zip(*rand_sequences))
             bit_patterns = [0]*len(rand_sequences)
             for j,z in enumerate(r_all):
                 for k in range(len(bit_patterns)):
@@ -1220,14 +1220,14 @@ class RhythmStreamTest(RhythmTest):
                required for rendering pattern audio into separate timbre channels prior to feature extraction
         """
         if patterns==None or not len(patterns):
-            print "_synthesize_patterns: patterns must be specified"
+            print("_synthesize_patterns: patterns must be specified")
             raise TestCollectionError()        
         if syn_params==None:
             syn_params=self.syn_params
-        print "Generating timbre-channel audio..."
+        print("Generating timbre-channel audio...")
         num_timbres = self._check_syn_params(patterns[0], syn_params)
         if num_timbres != syn_params['num_timbre_channels']:
-            print "num_timbre_channels mismatch in syn_params"
+            print("num_timbre_channels mismatch in syn_params")
             raise TestCollectionError()
         for i in range(len(patterns)):
             for t_chan in range(syn_params['num_timbre_channels']):
@@ -1271,9 +1271,9 @@ class RhythmStreamTest(RhythmTest):
         adb = audiodb.adb.get(self.adb_path,"r")
         lzt = adb.liszt()
         if not len(lzt):
-            print "AudioDB empty in setup_evaluation: ", self.adb_path
+            print("AudioDB empty in setup_evaluation: ", self.adb_path)
             raise TestCollectionError()
-        keys,lens = zip(*lzt)
+        keys,lens = list(zip(*lzt))
         km = KeyMapper(adb, self.num_patterns)
         klist = km.list_key_instances()
         if not len(klist):
@@ -1322,7 +1322,7 @@ class RhythmStreamTest(RhythmTest):
         """
         test_sets, test_set_list = self._initialize_test_set_lists(test_set_key, clear_lists)
         for test_set in test_set_list:
-            print "Evaluating test set:", test_set
+            print("Evaluating test set:", test_set)
             t_rkeys=[]
             t_ikeys=[]
             t_dists=[]
@@ -1333,15 +1333,15 @@ class RhythmStreamTest(RhythmTest):
                 t_ikeys.append(adb.configQuery['includeKeys']) # timbre-channel keys
                 t_rkeys.append([]) # per-query result keys
                 t_dists.append([]) # timbre-channel dists (re-combined later)
-                qkeys, qlens = zip(*lzt)
+                qkeys, qlens = list(zip(*lzt))
                 for q,qkey in enumerate( qkeys[ start_pos + t_chan : end_pos : self.feature_params['num_timbre_channels'] ] ):
                     res = adb.query(key=qkey).rawData
                     if len(res):
-                        rkeys, dst, qpos, rpos = zip(*res)
+                        rkeys, dst, qpos, rpos = list(zip(*res))
                         t_dists[t_chan].append(dst) # All result distances
                         t_rkeys[t_chan].append(rkeys) # timbre-channel distance-sorted keys
                     else:
-                        print "Empty result list: ", qkey
+                        print("Empty result list: ", qkey)
             ranks, dists = self.timbre_channel_distance(t_ikeys, t_rkeys, t_dists)
             self.ranks_list.append((test_set, ranks))
             self.dists_list.append((test_set, dists))            
@@ -1369,7 +1369,7 @@ class RhythmStreamTest(RhythmTest):
                         # distance is the sum for now
                         rdists[i] += dists[t_chan][r][i_idx]
                     except:
-                        print "Key not found in result list: ", ikeys[t_chan][i]
+                        print("Key not found in result list: ", ikeys[t_chan][i])
                         sys.stdout.flush()
             #search for the index of the transformation
             sort_idx = pylab.argsort(rdists)   # Sort fields into database order
@@ -1418,11 +1418,11 @@ class RhythmPLCATest(RhythmStreamTest):
                audio files and self.num_patterns transformed patterns audio files.
         """
 
-        print "Extracting features / audioDB insertion..."
+        print("Extracting features / audioDB insertion...")
         self._new_adb() 
         ext = self.uid + wave_suffix
 
-        print "Extracting gt features / timbre channels..."                
+        print("Extracting gt features / timbre channels...")                
         repl_gt_key=self._gen_patterns_hash(count_key=False)
         gt_key = self._gen_patterns_hash()
         self.insert_audio_files(glob.glob(self.collection_path + os.sep + "*" + repl_gt_key + ext))
@@ -1430,7 +1430,7 @@ class RhythmPLCATest(RhythmStreamTest):
         self.extract_timbre_channels(gt_key, repl_gt_key)
         self._insert_features_into_audioDB()
 
-        print "Extracting transformations features / timbre channels..."
+        print("Extracting transformations features / timbre channels...")
         repl_trans_key = self._gen_transformations_hash(count_key=False)
         trans_key = self._gen_transformations_hash()
         self.insert_audio_files(glob.glob(self.collection_path + os.sep + "*" + repl_trans_key + ext))
@@ -1463,11 +1463,11 @@ class RhythmPLCATest(RhythmStreamTest):
         self.insert_audio_files(glob.glob(self.collection_path + os.sep + "*" + keyrepl + ext))
         aList, fList, pList, kList = self._get_extract_lists(key+ext, keyrepl+ext, wave_suffix)
         if len(aList) != self.num_patterns:
-            print "audio_list length != num_patterns"
+            print("audio_list length != num_patterns")
             raise TestCollectionError()
         W, Z, H = self._separate_components(fList)
         # clustering and assignment
-        print "Kmeans clustering..."
+        print("Kmeans clustering...")
         X = pylab.hstack(W)
         if train:
             assigns = self._cluster_components(X)
@@ -1505,7 +1505,7 @@ class RhythmPLCATest(RhythmStreamTest):
         if num_exist == (self.num_patterns - 1) * (self.feature_params['num_timbre_channels'] - 1): # only checking timbre-channels >0
             return True
         else:
-            print "Only partial cache exists of files with key", key
+            print("Only partial cache exists of files with key", key)
             raise TestCollectionError()
         
     def _separate_components(self, feature_list):
@@ -1532,7 +1532,7 @@ class RhythmPLCATest(RhythmStreamTest):
         """
         # PLCA components extraction
         W, Z, H = [], [], []
-        print "PLCA analysis..."
+        print("PLCA analysis...")
         for feature_file in feature_list:
             V = self._load_features(feature_file)
             w, z, h, norm, recon, logprob = plca.PLCA.analyze(V.T, self.syn_params['num_components'])
@@ -1557,7 +1557,7 @@ class RhythmPLCATest(RhythmStreamTest):
 
             invert timbre-channels to wav files
         """
-        print "Timbre-channel grouping and synthesis..."
+        print("Timbre-channel grouping and synthesis...")
         dummy_signal= self._invert_plca(W[0][:,0], Z[0][0], H[0][0,:], S[0], F)
         signal_length = dummy_signal.size
         for i, audio_file in enumerate( audio_list ):
@@ -1577,7 +1577,7 @@ class RhythmPLCATest(RhythmStreamTest):
             invert timbre channels to feature files (direct to features, no audio inversion)
             clear rTupleList, append fName, pName, kName
         """
-        print "Timbre-channel grouping and feature synthesis..."
+        print("Timbre-channel grouping and feature synthesis...")
         if not time_funs_only:
             V0 = plca.PLCA.reconstruct(pylab.mat(W[0][:,0]).T,Z[0][0],pylab.mat(H[0][0,:]))
         else:

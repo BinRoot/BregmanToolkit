@@ -15,7 +15,7 @@ def ex_1a():
     """
     sinusoid
     """
-    print "Example 1: sinusoid"
+    print("Example 1: sinusoid")
     sys.stdout.flush()
     p = default_signal_params()
     x = sinusoid(**p)
@@ -25,7 +25,7 @@ def ex_2a():
     """
     harmonics
     """    
-    print "Example 2: harmonics"
+    print("Example 2: harmonics")
     sys.stdout.flush()
     p = default_signal_params()
     p['num_harmonics'] = 7
@@ -36,7 +36,7 @@ def ex_3a():
     """
     shepard tone
     """
-    print "Example 3a: Shepard tones, Deutch's Tri-Tone Paradox"
+    print("Example 3a: Shepard tones, Deutch's Tri-Tone Paradox")
     sys.stdout.flush()
     p = default_signal_params()
     p['num_harmonics']=7
@@ -50,7 +50,7 @@ def ex_3b():
     """
     gliding risset tones (devil's staircase)
     """
-    print "Example 3b: Shepard tones as gliding Risset tones"
+    print("Example 3b: Shepard tones as gliding Risset tones")
     sys.stdout.flush()
     p = default_signal_params()
     p['num_harmonics']=7
@@ -69,7 +69,7 @@ def ex_4a():
     """
     noise bands, bandwidth-expanided sinusoid
     """
-    print "Example 4: noise band, bandwidth-expanded sinusoid"
+    print("Example 4: noise band, bandwidth-expanded sinusoid")
     sys.stdout.flush()
     p = default_noise_params()
     x = noise(**p)
@@ -79,7 +79,7 @@ def ex_5a():
     """
     rhythm from noise bands
     """
-    print "Example 5: noise-band rhythm"
+    print("Example 5: noise-band rhythm")
     sys.stdout.flush()
     s,r,p = default_rhythm_params()
     x = rhythm(s,r,p)
